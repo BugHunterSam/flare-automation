@@ -22,9 +22,7 @@
 							"    As this will reduce the chance of the duplicate error message occuring randomly each time this test is run\r",
 							"    OR you can get a random image ID by calling GET /images/search function before this test instead\r",
 							"\r",
-							"    Note1: this API doesn't appear to work as expected with a non demo API key. a bug has been raised with the team as at 24/10/2022 and monitor the discord chat for an update\r",
-							"\r",
-							"    Note2: It looks like image_id doesn't validate with a known image id in the backend, however if there is no image to link to the GET favourites API returms an empty \"image\": {} object, ideally the API should return an error message in this case, something like a 404 resource not found\r",
+							"    Note1: It looks like image_id doesn't validate with a known image id in the backend, however if there is no image to link to the GET favourites API returms an empty \"image\": {} object, ideally the API should return an error message in this case, something like a 404 resource not found\r",
 							"*/\r",
 							"postman.setEnvironmentVariable(\"sub-id\", \"test-\" + _.random(1, 999999));"
 						],
