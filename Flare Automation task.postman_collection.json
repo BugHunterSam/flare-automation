@@ -1,0 +1,786 @@
+{
+	"info": {
+		"_postman_id": "fec09fff-54a1-4b2f-97c7-0279b76aa87a",
+		"name": "Flare Automation task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14398662"
+	},
+	"item": [
+		{
+			"name": "1 - /favourites - 200 response",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"/*\r",
+							"    Posting to favourites requires a unique account + image_id + sub_id\r",
+							"    Otherwise you will get the following error: \r",
+							"    400 Bad request - DUPLICATE_FAVOURITE\r",
+							"\r",
+							"    TODO Refactor: instead of adding a random 6 digit number to the end of a string, use $timestamp\t(The current UNIX timestamp in seconds) instead, e.g. 1562757107,1562757108, 1562757109\r",
+							"    As this will reduce the chance of the duplicate error message occuring randomly each time this test is run\r",
+							"    OR you can get a random image ID by calling GET /images/search function before this test instead\r",
+							"\r",
+							"    Note1: this API doesn't appear to work as expected with a non demo API key. a bug has been raised with the team as at 24/10/2022 and monitor the discord chat for an update\r",
+							"\r",
+							"    Note2: It looks like image_id doesn't validate with a known image id in the backend, however if there is no image to link to the GET favourites API returms an empty \"image\": {} object, ideally the API should return an error message in this case, something like a 404 resource not found\r",
+							"*/\r",
+							"postman.setEnvironmentVariable(\"sub-id\", \"test-\" + _.random(1, 999999));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"postman.setEnvironmentVariable(\"favourite-id\", responseJson.id);\r",
+							"\r",
+							"pm.test(\"Check the response has a status of SUCCESS\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(200);\r",
+							"    pm.expect(responseJson.message).to.be.a('string');\r",
+							"    pm.expect(responseJson.message).to.eql(\"SUCCESS\");\r",
+							"    pm.expect(responseJson.id).to.be.a('number');\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"image_id\":\"{{image-id}}\",\n\t\"sub_id\": \"{{sub-id}}\"\n}"
+				},
+				"url": {
+					"raw": "{{endpoint}}v1/favourites",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites"
+					]
+				},
+				"description": "\n\n#### POST Body Parameters\n\n| Key  | Required | Description                                                                                     |\n|------|----------|-------------------------------------------------------------------------------------------------|\n| image_id | required | The id of the image to favourite.\n| sub_id | optional | A custom value you can set yourself, and then use to split the results of GET /favourites by, e.g. your own user's id.                                                    |"
+			},
+			"response": [
+				{
+					"name": "/favourites - creating a favourite with a sub_id",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{API-KEY}}",
+								"description": "[required]"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"image_id\":\"9ccXTANkb\",\n\t\"sub_id\": \"my-user-1234\"\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}v1/favourites",
+							"host": [
+								"{{endpoint}}v1"
+							],
+							"path": [
+								"favourites"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 08 Nov 2018 10:22:48 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "X-Response-Time",
+							"value": "9ms"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"SUCCESS\",\n    \"id\": 1708\n}"
+				},
+				{
+					"name": "/favourites - saving a favourite to your account without a sub_id",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{API-KEY}}",
+								"description": "[required]"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"image_id\":\"9ccXTANkb\"\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}v1/favourites",
+							"host": [
+								"{{endpoint}}v1"
+							],
+							"path": [
+								"favourites"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 08 Nov 2018 10:23:08 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "X-Response-Time",
+							"value": "10ms"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"SUCCESS\",\n    \"id\": 1709\n}"
+				}
+			]
+		},
+		{
+			"name": "2 - /favourites",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/*\r",
+							"    Note: in order for this test to pass there should be atleast 1 thing added to favourites\r",
+							"    TODO refactor: add a pre-request script that checks this is response is not empty, if empty do a POST /favourites request\r",
+							"*/\r",
+							"const responseJson = pm.response.json();  \r",
+							"postman.setEnvironmentVariable(\"favourite-id\", responseJson[0].id);\r",
+							"\r",
+							"pm.test(\"Check the response has atleast one id element\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(200);\r",
+							"    pm.expect(responseJson[0]).to.have.property('id');\r",
+							"    pm.expect(responseJson[0].id).to.be.a(\"number\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}v1/favourites?sub_id={{sub-id}}",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites"
+					],
+					"query": [
+						{
+							"key": "sub_id",
+							"value": "{{sub-id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3 - /favourites/:favourite_id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/*\r",
+							"    Note: in order for this test to pass there should be a favourite to delete, run API 1 and 2 before running this API\r",
+							"    TODO refactor: add a pre-request script that checks the favourite exists, if there is nothing to delete do a POST /favourites request before doing the delete\r",
+							"*/\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Check the response has a status of SUCCESS\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(200);\r",
+							"    pm.expect(responseJson.message).to.be.a('string');\r",
+							"    pm.expect(responseJson.message).to.eql(\"SUCCESS\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}v1/favourites/:favourite_id",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites",
+						":favourite_id"
+					],
+					"variable": [
+						{
+							"key": "favourite_id",
+							"value": "{{favourite-id}}",
+							"description": "The id of the Favourite you want to delete from your account"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "/favourites/:favourite_id - deleting a favourite from your account",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{API-KEY}}",
+								"description": "[required]"
+							}
+						],
+						"url": {
+							"raw": "{{endpoint}}v1/favourites/:favourite_id",
+							"host": [
+								"{{endpoint}}v1"
+							],
+							"path": [
+								"favourites",
+								":favourite_id"
+							],
+							"variable": [
+								{
+									"key": "favourite_id",
+									"value": "{{favourite-id}}",
+									"description": "The id of the Favourite you want to delete from your account"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 08 Nov 2018 10:25:12 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Server",
+							"value": "nginx/1.12.1"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "X-Response-Time",
+							"value": "8ms"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"SUCCESS\"\n}"
+				}
+			]
+		},
+		{
+			"name": "/favourites/:favourite_id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Check the response has our favourite-id\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(200);\r",
+							"    pm.expect(String(responseJson.id)).to.eql(pm.variables.get('favourite-id'));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}v1/favourites/:favourite_id",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites",
+						":favourite_id"
+					],
+					"variable": [
+						{
+							"key": "favourite_id",
+							"value": "{{favourite-id}}",
+							"description": "The id of the individual Favourite you want to get"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/favourites - empty array",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"postman.setEnvironmentVariable(\"sub-id\", \"test-\" + _.random(1, 999999));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/*\r",
+							"    Question: should this request should return a 404, not a 200?\r",
+							"*/\r",
+							"const responseJson = pm.response.json();  \r",
+							"\r",
+							"pm.test(\"Check the response has atleast one id element\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(200);\r",
+							"    pm.expect(responseJson).to.be.empty;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}v1/favourites?sub_id={{sub-id}}",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites"
+					],
+					"query": [
+						{
+							"key": "sub_id",
+							"value": "{{sub-id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/favourites - 400 duplicate error message",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/*\r",
+							"    Note: may need to run twice to get to pass if it hasn't been run at first\r",
+							"\r",
+							"    TODO refactor: add a pre-request script that checks the favourite already exists\r",
+							"*/\r",
+							"\r",
+							"pm.test(\"Check duplicate error message\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(400);\r",
+							"    pm.expect(pm.response.text()).to.include(\"DUPLICATE_FAVOURITE\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"image_id\":\"{{image-id}}\",\n\t\"sub_id\": \"{{sub-id}}\"\n}"
+				},
+				"url": {
+					"raw": "{{endpoint}}v1/favourites",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites"
+					]
+				},
+				"description": "\n\n#### POST Body Parameters\n\n| Key  | Required | Description                                                                                     |\n|------|----------|-------------------------------------------------------------------------------------------------|\n| image_id | required | The id of the image to favourite.\n| sub_id | optional | A custom value you can set yourself, and then use to split the results of GET /favourites by, e.g. your own user's id.                                                    |"
+			},
+			"response": []
+		},
+		{
+			"name": "/favourites - 401 unauthorized error message",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"/*\r",
+							"    Posting to favourites requires a unique account + image_id + sub_id\r",
+							"    Otherwise you will get the following error: \r",
+							"    DUPLICATE_FAVOURITE - favourites are unique for account + image_id + sub_id\r",
+							"\r",
+							"    TODO Refactor: instead of adding a random 6 digit number to the end of a string, use $timestamp\t(The current UNIX timestamp in seconds) instead, e.g. 1562757107,1562757108, 1562757109\r",
+							"    As this will reduce the chance of the duplicate error message occuring randomly each time this test is run\r",
+							"\r",
+							"    Also note: this API doesn't appear to work with a non demo API key. a bug has been raised with the team and monitor the discord for an update\r",
+							"*/\r",
+							"postman.setEnvironmentVariable(\"sub-id\", \"test-\" + _.random(1, 999999));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check 401 error message\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(401);\r",
+							"    pm.expect(pm.response.text()).to.include(\"AUTHENTICATION_ERROR\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"image_id\":\"{{image-id}}\",\n\t\"sub_id\": \"{{sub-id}}\"\n}"
+				},
+				"url": {
+					"raw": "{{endpoint}}v1/favourites",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites"
+					]
+				},
+				"description": "\n\n#### POST Body Parameters\n\n| Key  | Required | Description                                                                                     |\n|------|----------|-------------------------------------------------------------------------------------------------|\n| image_id | required | The id of the image to favourite.\n| sub_id | optional | A custom value you can set yourself, and then use to split the results of GET /favourites by, e.g. your own user's id.                                                    |"
+			},
+			"response": []
+		},
+		{
+			"name": "/favourites - 400 doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/*\r",
+							"    Note: should this return a 404; resource not found instead of a bad request?\r",
+							"*/\r",
+							"\r",
+							"pm.test(\"Check the response has a status of SUCCESS\", () => {\r",
+							"    pm.expect(pm.response.code).to.eql(400);\r",
+							"    pm.expect(pm.response.text()).to.include(\"INVALID_ACCOUNT\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API-KEY}}",
+						"description": "[required]"
+					}
+				],
+				"url": {
+					"raw": "{{endpoint}}v1/favourites/:favourite_id",
+					"host": [
+						"{{endpoint}}v1"
+					],
+					"path": [
+						"favourites",
+						":favourite_id"
+					],
+					"variable": [
+						{
+							"key": "favourite_id",
+							"value": "{{favourite-id}}",
+							"description": "The id of the Favourite you want to delete from your account"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
